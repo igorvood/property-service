@@ -66,6 +66,27 @@
         <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
+                <groupId>ru.vood</groupId>
+                <artifactId>code-generator-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <pluginPropertyYamlFile>${basedir}\src\main\resources\CodeGenerator.yaml
+
+                    </pluginPropertyYamlFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>

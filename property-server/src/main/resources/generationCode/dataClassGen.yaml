@@ -1,0 +1,14 @@
+#!!ru.vood.generator.read.dto.TemplateParamDto
+map:
+  - {key: VAL_1, val: JAVA}
+  - {key: VAL_2, val: KOTLIN}
+multiList:
+  - key: key5000
+    val: [s1, s2]
+  - key: key6000
+    val: [s3, s4]
+multiMaps:
+  - key: key10
+    val:
+      - !!ru.vood.generator.read.dto.KeyValDto {key: key100, val: val200}
+      - !!ru.vood.generator.read.dto.KeyValDto {key: key300, val: val400}

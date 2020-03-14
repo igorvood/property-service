@@ -1,10 +1,10 @@
 create table dict_external_service
 (
-    id        varchar2(20)  not null,
+    id                 varchar2(20) not null,
     constraint dict_external_service_pk primary key (id)
         using index tablespace jp_idx,
-    deleted_at      date,
-    date_create timestamp,
+    deleted_at         date,
+    date_create        timestamp,
     reprocessing_count number
 )
 /

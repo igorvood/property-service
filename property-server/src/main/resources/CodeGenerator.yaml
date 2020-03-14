@@ -1,0 +1,7 @@
+generateParamDto:
+  - classSeparator: ===================separator class======================
+    classType: KOTLIN
+    templateEngine: FREE_MARKER_DATABASE
+    dataBase: {jdbcDriver: oracle.jdbc.driver.OracleDriver, passwordDb: 1, urlDb: jdbc:oracle:thin:@//localhost:1521/jp, userDb: jp}
+    templateParamFilesDto:
+      - {templateFile: src\main\resources\generationCode\dataClassGen.ftl, templateParamFile: src\main\resources\generationCode\dataClassGen.yaml}
