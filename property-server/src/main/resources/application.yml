@@ -4,6 +4,11 @@ spring:
     username: jp
     password: 1
     url: jdbc:oracle:thin:@localhost:1521/jp
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase/liquibase-outputChangeLog.xml
+
+
 
 server:
   port: 6060
