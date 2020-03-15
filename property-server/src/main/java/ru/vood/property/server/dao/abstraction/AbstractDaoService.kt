@@ -26,6 +26,8 @@ abstract class AbstractDaoService<T>(var clazz: Class<T>) : CommonDaoService<T> 
                 .map { it.column to it }
                 .toMap()
         sqls[SqlOperation.INSERT] = getInsert(this.table, this.fileds)
+        sqls[SqlOperation.SELECT_ALL] = getSelectOne(this.table, this.fileds)
+        sqls[SqlOperation.SELECT_ONE] = getSelectAll(this.table, this.fileds)
         sqls[SqlOperation.UPDATE] = getUpdate(this.table, this.fileds)
         sqls[SqlOperation.DELETE] = getDelete(this.table, this.fileds)
         sqls.entries
@@ -33,16 +35,30 @@ abstract class AbstractDaoService<T>(var clazz: Class<T>) : CommonDaoService<T> 
         println("1")
     }
 
+    private fun getSelectOne(table: TableDto, fileds: Map<String, FieldDto>): String {
+        val columns = getAllColumns(fileds)
+        val where = getWhereByPks(fileds, 1)
+        return "select $columns from ${table.owner}.${table.tableName} where $where"
+    }
+
+    private fun getSelectAll(table: TableDto, fileds: Map<String, FieldDto>): String {
+        val columns = getAllColumns(fileds)
+        return "select $columns from ${table.owner}.${table.tableName}"
+    }
+
     private fun getInsert(table: TableDto, fileds: Map<String, FieldDto>): String {
         val binds = IntStream.range(1, fileds.keys.size + 1)
                 .mapToObj { ":$it" }
                 .reduce { s1, s2 -> "$s1 , $s2" }
                 .get()
-        val columns = fileds.values.stream()
-                .map { it.column }
+        val columns = getAllColumns(fileds)
+        return "insert into ${table.owner}.${table.tableName}($columns) select $binds from dual"
+    }
+
+    private fun getAllColumns(fileds: Map<String, FieldDto>): String {
+        return fileds.keys.stream()
                 .reduce { s1, s2 -> "$s1 , $s2" }
                 .get()
-        return "insert into ${table.owner}.${table.tableName}($columns) select $binds from dual"
     }
 
     private fun getUpdate(table: TableDto, fileds: Map<String, FieldDto>): String {
