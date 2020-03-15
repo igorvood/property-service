@@ -22,7 +22,7 @@ abstract class AbstractDaoService<T>(var clazz: Class<T>) : CommonDaoService<T> 
         val tableAnnotation = clazz.getAnnotation(Table::class.java)
         this.table = TableDto(tableAnnotation.owner, tableAnnotation.name)
         this.fileds = this.clazz.declaredFields
-                .map { FieldDto(getColumn(it.declaredAnnotations), it, it.getAnnotation(Pk::class.java) != null) }
+                .map { FieldDto(getColumn(it.declaredAnnotations), it, it.getAnnotation(Pk::class.java) != null, getColumnId(it.declaredAnnotations)) }
                 .map { it.column to it }
                 .toMap()
         sqls[SqlOperation.INSERT] = getInsert(this.table, this.fileds)
@@ -38,8 +38,10 @@ abstract class AbstractDaoService<T>(var clazz: Class<T>) : CommonDaoService<T> 
                 .mapToObj { ":$it" }
                 .reduce { s1, s2 -> "$s1 , $s2" }
                 .get()
-        val columns = fileds.keys
+        val columns = fileds.values.stream()
+                .map { it.column }
                 .reduce { s1, s2 -> "$s1 , $s2" }
+                .get()
         return "insert into ${table.owner}.${table.tableName}($columns) select $binds from dual"
     }
 
@@ -71,11 +73,23 @@ abstract class AbstractDaoService<T>(var clazz: Class<T>) : CommonDaoService<T> 
     }
 
     private fun getColumn(declaredAnnotations: Array<Annotation>): String {
-        val first = declaredAnnotations.first { it is Column || it is Pk }
+        val first = getAnnotation(declaredAnnotations)
         if (first is Column)
             return first.name
         if (first is Pk)
             return first.name
         throw IllegalStateException("Annotation Column or Pk not found")
     }
+
+    private fun getColumnId(declaredAnnotations: Array<Annotation>): Int {
+        val first = getAnnotation(declaredAnnotations)
+        if (first is Column)
+            return first.colId
+        if (first is Pk)
+            return first.colId
+        throw IllegalStateException("Annotation Column or Pk not found")
+    }
+
+    private fun getAnnotation(declaredAnnotations: Array<Annotation>) =
+            declaredAnnotations.first { it is Column || it is Pk }
 }

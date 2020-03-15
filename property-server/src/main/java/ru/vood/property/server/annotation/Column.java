@@ -10,4 +10,6 @@ import java.lang.annotation.*;
 @Indexed
 public @interface Column {
     String name() default "";
+
+    int colId() default 0;
 }

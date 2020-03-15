@@ -14,4 +14,7 @@ public @interface Pk {
 
     @AliasFor(annotation = Column.class)
     String name() default "";
+
+    @AliasFor(annotation = Column.class)
+    int colId() default 0;
 }

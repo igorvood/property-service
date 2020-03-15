@@ -26,7 +26,8 @@
     tc.table_name,
     tc.column_name,
     tc.data_type,
-    cc.comments,
+    tc.column_id,
+    nvl(cc.comments,'NO COMMENTS'),
     decode(acc.constraint_name, null, 0, 1) pk,
     decode(tc.nullable, 'N', ' ', '?') nullable
     from ALL_TAB_COLS tc
@@ -36,6 +37,7 @@
     join ALL_COL_COMMENTS cc on (cc.owner, cc.table_name, cc.column_name) = ((tc.owner, tc.table_name, tc.column_name))
     where tc.owner = :2
     and tc.table_name = :3
+    and tc.virtual_column = 'NO'
 </#local>
     <#local tab = conn.query(sql,[pk, owner, table])/>
     <#return tab/>
@@ -49,12 +51,6 @@
         <#local tab = 'Column'/>
     </#if>
 </#function>
-
-<#--   -->
-<#--<#function get_ids sel>-->
-<#--    <#local i = conn.query(sel)/>-->
-<#--    <#return i/>-->
-<#--</#function>-->
 
 <#assign tables = get_list_tables()/>
 <#macro generateClass tab>
@@ -75,8 +71,9 @@ data class ${util.toCamelCase(t.TABLE_NAME)} (
 <#assign cols = get_list_columns(t.OWNER, t.TABLE_NAME, t.PK_NAME)/>
 <#assign fields>
 <#list cols as c>
-    /* ${c.COMMENTS} */
-    @${get_annotation(c.PK)}(name = "${c.COLUMN_NAME}")
+
+<#--    /* ${c.COMMENTS} */-->
+    @${get_annotation(c.PK)}(name = "${c.COLUMN_NAME}", colId=${c.COLUMN_ID})
     val ${util.toCamelCaseFirstLetterLower(c.COLUMN_NAME)}: ${util.sqlToJavaTypeMapping(c.DATA_TYPE)}${c.NULLABLE},
 </#list>
 </#assign>${fields?remove_ending(",
@@ -86,12 +83,4 @@ data class ${util.toCamelCase(t.TABLE_NAME)} (
 </#list>
 </#macro>
 <@generateClass tables/>
-
-
-
-
-
-
-
-
 <#flush>
