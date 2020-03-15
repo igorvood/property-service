@@ -38,6 +38,7 @@
     where tc.owner = :2
     and tc.table_name = :3
     and tc.virtual_column = 'NO'
+    order by tc.column_name
 </#local>
     <#local tab = conn.query(sql,[pk, owner, table])/>
     <#return tab/>
@@ -55,13 +56,12 @@
 <#assign tables = get_list_tables()/>
 <#macro generateClass tab>
     <#list tab as t>
-package com.example.demo.generate
+        package ru.vood.property.server.generation.dto
 
 import ru.vood.property.server.annotation.Column
 import ru.vood.property.server.annotation.Pk
 import ru.vood.property.server.annotation.Table
 import javax.annotation.Generated
-
 /**
 * Генерированный класс для доступа к таблице
 */
