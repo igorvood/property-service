@@ -5,6 +5,14 @@
 <#assign map = par['map']/>
 <#assign multiList = par['multiList']/>
 
+<#function print_not_last symbol idx max_idx>
+    <#if idx!=max_idx>
+        <#return symbol/>
+    <#else>
+        <#return ' '/>
+    </#if>
+</#function>
+
 <#function get_list_tables>
     <#local sql>
         select aat.owner,
@@ -71,13 +79,12 @@ data class ${util.toCamelCase(t.TABLE_NAME)} (
 <#assign cols = get_list_columns(t.OWNER, t.TABLE_NAME, t.PK_NAME)/>
 <#assign fields>
 <#list cols as c>
-
 <#--    /* ${c.COMMENTS} */-->
     @${get_annotation(c.PK)}(name = "${c.COLUMN_NAME}", colId=${c.COLUMN_ID})
-    val ${util.toCamelCaseFirstLetterLower(c.COLUMN_NAME)}: ${util.sqlToJavaTypeMapping(c.DATA_TYPE)}${c.NULLABLE},
+    val ${util.toCamelCaseFirstLetterLower(c.COLUMN_NAME)}: ${util.sqlToJavaTypeMapping(c.DATA_TYPE)}${c.NULLABLE}${print_not_last(',',c?counter, cols?size)}
 </#list>
-</#assign>${fields?remove_ending(",
-")}
+</#assign>
+        ${fields}
 )
 ===================separator class======================
 </#list>
