@@ -1,8 +1,7 @@
 package ru.vood.property.server.dao
 
-import org.springframework.util.ReflectionUtils
 import ru.vood.property.server.annotation.Column
-import sun.reflect.misc.ReflectUtil
+import ru.vood.property.server.annotation.Pk
 
 class AbstractDaoService<T> : CommonDaoService<T> {
     lateinit var clazz: Class<T>
@@ -17,11 +16,11 @@ class AbstractDaoService<T> : CommonDaoService<T> {
     }
 
     private fun getColumn(declaredAnnotations: Array<Annotation>): String {
-
-        return declaredAnnotations
-//                .map { getParentAnnotation() }
-                .filter { it is Column }
-                .map { (it as Column).name }
-                .first()
+        val first = declaredAnnotations.first { it is Column || it is Pk }
+        if (first is Column)
+            return first.name
+        if (first is Pk)
+            return first.name
+        throw IllegalStateException("Annotation Column or Pk not found")
     }
 }
